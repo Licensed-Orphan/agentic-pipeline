@@ -1,25 +1,44 @@
 # Agentic Pipeline
 
-A complete pipeline for AI-powered multi-agent software development with Claude Code. Four sequential skills transform a product idea into a fully executed codebase built by coordinated agent swarms.
+A complete pipeline for AI-powered multi-agent software development with Claude Code. Five sequential skills transform a research question into a fully executed codebase built by coordinated agent swarms.
 
 ## Pipeline Overview
 
 ```
-PRD --> Architecture --> Implementation --> Execution
+Research --> PRD --> Architecture --> Implementation --> Execution
 ```
 
 | Stage | Skill | Purpose | Output |
 |-------|-------|---------|--------|
-| 1. PRD | `agentic-prd` | Define what to build and why | `PRD.md` |
-| 2. Architecture | `agentic-architecture` | Design structural decomposition for parallel work | `ARCHITECTURE.md` |
-| 3. Implementation | `agentic-implementation` | Break architecture into agent-executable tasks | `IMPLEMENTATION.md` |
-| 4. Execution | `agentic-execution` | Live dispatch, monitoring, and completion | `EXECUTION.md` |
+| 1. Research | `research` | Investigate the problem space, technology landscape, and domain | `./research/RESEARCH-[topic].md` |
+| 2. PRD | `agentic-prd` | Define what to build and why | `PRD.md` |
+| 3. Architecture | `agentic-architecture` | Design structural decomposition for parallel work | `ARCHITECTURE.md` |
+| 4. Implementation | `agentic-implementation` | Break architecture into agent-executable tasks | `IMPLEMENTATION.md` |
+| 5. Execution | `agentic-execution` | Live dispatch, monitoring, and completion | `EXECUTION.md` |
 
 ## What's Inside
 
 Each skill contains:
 - **README.md** -- The main skill definition with workflow, principles, and methodology
 - **references/** -- Templates, patterns, and detailed guidance documents
+
+### Skill: Research (`skills/research/`)
+
+Deep research engine that serves as the genesis of the agentic pipeline. Investigates any topic -- technical, product/market, or domain -- producing structured, pipeline-aware research artifacts. Uses a 6-phase adaptive workflow with intelligent source routing across web, Slack, Confluence, Jira, Gmail, Gong, and Snowflake.
+
+**Methodology:**
+- MECE decomposition for exhaustive, non-overlapping research coverage
+- Pyramid Principle output structure (conclusions first, evidence on demand)
+- SIFT source evaluation with 3-tier credibility scoring
+- Analysis of Competing Hypotheses (ACH) for conflict resolution
+- Triangulation across source types for confidence scoring
+- Information foraging stopping criteria
+
+**References:**
+- `output-template.md` -- Pipeline-aware research artifact template
+- `scoping-guide.md` -- Scoping question bank by research type
+- `source-evaluation.md` -- Source evaluation criteria (SIFT method) and citation guide
+- `methodology.md` -- Research methodology patterns (MECE, Pyramid Principle, ACH, funnel technique)
 
 ### Skill: Agentic PRD (`skills/agentic-prd/`)
 
@@ -80,6 +99,7 @@ To use these as Claude Code slash commands, copy each skill directory into your 
 
 ```bash
 # Copy all skills
+cp -r skills/research ~/.claude/skills/research
 cp -r skills/agentic-prd ~/.claude/skills/agentic-prd
 cp -r skills/agentic-architecture ~/.claude/skills/agentic-architecture
 cp -r skills/agentic-implementation ~/.claude/skills/agentic-implementation
@@ -89,12 +109,13 @@ cp -r skills/agentic-execution ~/.claude/skills/agentic-execution
 Then rename `README.md` back to `SKILL.md` in each:
 
 ```bash
-for dir in ~/.claude/skills/agentic-*/; do
+for dir in ~/.claude/skills/research ~/.claude/skills/agentic-*/; do
   mv "$dir/README.md" "$dir/SKILL.md"
 done
 ```
 
 After installation, use the skills as slash commands in Claude Code:
+- `/research` -- Investigate a topic (the pipeline genesis)
 - `/agentic-prd` -- Generate a PRD
 - `/agentic-architecture` -- Generate an architecture plan
 - `/agentic-implementation` -- Generate an implementation plan
@@ -109,6 +130,8 @@ Key empirical findings that inform the pipeline:
 - **79% specification failure rate** (MAST/UC Berkeley, 2025): Most multi-agent failures come from spec issues, not model limitations
 - **90.2% improvement** (Anthropic): Opus lead + Sonnet workers outperformed single-agent Opus
 - **15x token cost** (Anthropic): Multi-agent systems use ~15x more tokens -- budget controls are essential
+- **57% post-rationalized citations** (arXiv 2412.18004): LLMs often generate claims first then find citations -- the research skill combats this with retrieval-first reasoning
+- **14 failure modes** (DEFT taxonomy, 2025): Categorized across reasoning, retrieval, and generation -- the research skill explicitly mitigates each
 
 ## License
 
