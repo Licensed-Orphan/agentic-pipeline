@@ -24,7 +24,7 @@ Each skill contains:
 
 ### Skill: Research (`skills/research/`)
 
-Deep research engine that serves as the genesis of the agentic pipeline. Investigates any topic -- technical, product/market, or domain -- producing structured, pipeline-aware research artifacts. Uses a 6-phase adaptive workflow with intelligent source routing across web, Slack, Confluence, Jira, Gmail, Gong, and Snowflake.
+Deep research engine that serves as the genesis of the agentic pipeline. Investigates any topic -- technical, product/market, or domain -- producing structured, pipeline-aware research artifacts. Uses a 6-phase adaptive workflow with intelligent source routing across web, Slack, Confluence, Jira, Gmail, Gong, Snowflake, and Figma.
 
 **Methodology:**
 - MECE decomposition for exhaustive, non-overlapping research coverage

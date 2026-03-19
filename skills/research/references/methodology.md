@@ -103,6 +103,9 @@ Route research queries to the most appropriate source types:
 | Industry trends | Research papers, analyst reports | Conference talks | Hype articles |
 | Implementation patterns | GitHub repos, docs | Stack Overflow, blogs | Tutorial sites |
 | Regulatory requirements | Official regulatory texts | Legal team (Slack/email) | Secondary summaries |
+| UI/UX patterns & design | Figma files, design system | Competitor screenshots | Marketing mockups |
+| Design system components | Figma (get_design_context) | Confluence design docs | Outdated specs |
+| Visual competitive analysis | Figma, competitor products | Industry design blogs | Dribbble/Behance |
 
 ### Query Formulation by Source
 

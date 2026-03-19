@@ -170,3 +170,12 @@ For non-web sources, use these formats:
     Context: [What this issue reveals about the problem space]
     Tier: 2
 ```
+
+**Figma:**
+```
+[N] **Figma: [File/Frame Name]** -- [Designer/Team] (Last modified: Date)
+    URL: [figma.com URL]
+    Context: [What design decisions, patterns, or components this reveals
+    and how it informs the research]
+    Tier: 2 (design decisions) or Tier 1 (if it's the canonical design system)
+```

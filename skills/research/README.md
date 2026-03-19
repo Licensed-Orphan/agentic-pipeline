@@ -5,7 +5,7 @@ description: >
   or domain -- producing structured, pipeline-aware research artifacts optimized
   for feeding into the agentic PRD → Architecture → Implementation → Execution
   pipeline. Supports web search, internal tools (Slack, Confluence, Jira, Gmail,
-  Gong, Snowflake), and adaptive depth calibration. Use when: researching a
+  Gong, Snowflake, Figma), and adaptive depth calibration. Use when: researching a
   topic before building, investigating technical approaches, exploring a problem
   space, conducting competitive analysis, or any task prefixed with "research".
   Triggers on phrases like "research", "investigate", "explore", "look into",
@@ -97,6 +97,9 @@ Apply intelligent source routing:
 - **Gmail**: Stakeholder communications, external vendor/partner context
 - **Gong**: Customer voice, sales objections, pain points, feature requests
 - **Snowflake**: Usage data, adoption metrics, quantitative evidence
+- **Figma**: Existing design patterns, UI/UX decisions, design system components,
+  competitive design references, wireframes, and prototypes. Use get_design_context
+  and get_screenshot to extract design intent from Figma files the user references
 
 #### 2b. Execute Wide Research
 
@@ -123,6 +126,8 @@ sub-agents for independent research threads. Each sub-agent should:
 - Direct customer voice (Gong, support tickets) over analyst reports
 - Quantitative data (Snowflake, usage metrics) over qualitative impressions
 - Competitive products' actual behavior over marketing claims
+- Existing Figma designs and prototypes for understanding current UX patterns,
+  design decisions, and design system components
 
 **For domain research**, prioritize:
 - Academic papers and textbooks over popularizations
