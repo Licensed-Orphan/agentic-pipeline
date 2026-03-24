@@ -12,10 +12,8 @@ description: >
   on phrases like "implementation plan", "build plan", "execution plan",
   "implement this architecture", "plan the implementation", "agentic implementation",
   "create tasks from this architecture".
-license: MIT
-metadata:
-  version: "2.0"
-  author: wesleydubose
+  Not for: live dispatch and runtime orchestration (use agentic-execution),
+  or structural decomposition without agent-awareness (use agentic-architecture).
 ---
 
 # Agentic Implementation Planner
@@ -32,6 +30,30 @@ agent-aware (tasks are sized for context windows, scoped to avoid file conflicts
 ordered for parallel execution) but not agent-specific (it does not choose
 orchestration runtimes or define specialist agent configurations -- that belongs
 to the downstream execution skill).
+
+## Key Principles
+
+1. **Tasks are the unit of work** -- every agent receives one task at a time
+   with clear inputs, outputs, and verification criteria; never hand an agent
+   an entire module without decomposition
+2. **Solvability, completeness, non-redundancy** -- every task must be
+   independently solvable, the full set must cover all requirements, and no
+   two tasks should overlap (AOP framework, ICLR 2025)
+3. **Test first, implement second** -- every task begins with writing tests that
+   define the expected behavior; implementation follows until tests pass
+4. **Isolate everything** -- every agent works on its own files; no shared
+   mutable state during execution
+5. **Gate every transition** -- no task advances without passing its verification
+   gate; no wave starts without the prior wave's gate passing
+6. **Spawn prompts are contracts** -- the quality of the spawn prompt determines
+   the quality of the output; invest heavily in precise, complete prompts
+7. **Plan for failure** -- every task has a recovery procedure; every merge has
+   a rollback path; every agent can be respawned from scratch
+8. **Foundation is sacred** -- Tier 0 tasks build the shared types, schemas,
+   and utilities that everything else depends on; rush the foundation and
+   every downstream task will fail
+9. **Ship in waves** -- each execution wave should leave the codebase in a
+   runnable, testable state; no wave should break the build
 
 ## Position in the Pipeline
 
@@ -177,51 +199,33 @@ reference "what we discussed" or assume shared conversational context.
 - Referencing the lead's conversation ("as we discussed") -- agents have no
   access to the lead's history; embed all necessary context directly
 
-### 5. Define Verification Gates
+### 5. Define Verification, Merge & Recovery
 
-Design the verification strategy that runs at every checkpoint. This is the
-implementation plan's quality assurance backbone.
+Design the verification gates, merge strategy, and recovery procedures. These
+three concerns are tightly coupled -- a gate failure triggers a merge rollback,
+which triggers a recovery procedure.
 
-See [references/verification-gates.md](references/verification-gates.md) for
-the complete verification framework.
-See [references/verification-strategy.md](references/verification-strategy.md)
-for testing and integration verification patterns.
-
-**Four-level verification lattice:**
-1. **Task-level** (after every task): Unit tests pass, lint clean, type check clean
-2. **Module-level** (after all tasks in a module): Contract compliance tests pass,
-   export verification, all module unit tests pass
-3. **Wave-level** (at synchronization gates): Integration tests across completed
-   modules, sequential merge with test-after-each, regression gate (all prior
-   wave tests must pass before advancing)
-4. **Plan-level** (final integration): Full E2E test suite, build verification,
-   PRD acceptance criteria verification, manual exploratory testing
-
-### 6. Plan the Merge Strategy
-
-Define how parallel work converges into a single codebase.
-
+See [references/verification.md](references/verification.md) for the complete
+verification framework and testing patterns.
 See [references/merge-integration.md](references/merge-integration.md) for
 merge strategy patterns.
+See [references/progress-tracking.md](references/progress-tracking.md) for
+tracking and recovery patterns.
+
+**Four-level verification lattice:**
+
+| Level | Trigger | Checks |
+|-------|---------|--------|
+| Task | After every task | Unit tests pass, lint clean, type check clean |
+| Module | After all tasks in a module | Contract compliance, export verification, all module tests |
+| Wave | At synchronization gates | Integration tests, sequential merge with test-after-each, regression gate |
+| Plan | Final integration | Full E2E suite, build verification, PRD acceptance criteria |
 
 **Merge principles:**
 - Sequential merge with test-after-each (merge one branch, run all tests, repeat)
 - Foundation branch merges first -- it is the base for all feature branches
 - Feature branches merge in dependency order (leaves before roots)
 - If a merge introduces test failures, revert and fix before proceeding
-- Designate a merge conductor (agent or human) to manage the merge sequence
-
-### 7. Define Progress Tracking & Recovery
-
-Establish how implementation progress is monitored and how failures are handled.
-
-See [references/progress-tracking.md](references/progress-tracking.md) for
-tracking and recovery patterns.
-
-**Progress tracking:**
-- Task status board (Not Started / In Progress / Testing / Done / Failed)
-- Meaningful git commits at each task completion for context recovery
-- Feature list file (JSON/markdown) with pass/fail status per feature
 
 **Recovery procedures:**
 - Task failure: Discard worktree, diagnose root cause, respawn with updated prompt
@@ -230,7 +234,7 @@ tracking and recovery patterns.
 - Context exhaustion: Split remaining tasks, spawn fresh agent
 - Cascading failure: Halt all agents, reassess architecture, update plan
 
-### 8. Write the Implementation Plan
+### 6. Write the Implementation Plan
 
 Generate the implementation plan using the template in the reference files.
 
@@ -247,7 +251,7 @@ Every plan must include:
 - **Progress Tracking** setup and recovery procedures
 - **Risk Register** with mitigation strategies
 
-### 9. Deliver
+### 7. Deliver
 
 Write the implementation plan to a file (default: `IMPLEMENTATION.md` in the
 project root, or as the user specifies).
@@ -276,29 +280,9 @@ skill. If any of these are missing, the execution plan cannot be built:
 | Merge Strategy | Merge ordering and procedures | Merge sequence commands |
 | Recovery Procedures | Failure handling per failure type | Adaptive re-planning |
 
-## Key Principles
+## Examples
 
-1. **Tasks are the unit of work** -- every agent receives one task at a time
-   with clear inputs, outputs, and verification criteria; never hand an agent
-   an entire module without decomposition
-2. **Solvability, completeness, non-redundancy** -- every task must be
-   independently solvable, the full set must cover all requirements, and no
-   two tasks should overlap (AOP framework, ICLR 2025)
-3. **Test first, implement second** -- every task begins with writing tests that
-   define the expected behavior; implementation follows until tests pass
-4. **Isolate everything** -- every agent works on its own files; no shared
-   mutable state during execution
-5. **Gate every transition** -- no task advances without passing its verification
-   gate; no wave starts without the prior wave's gate passing
-6. **Spawn prompts are contracts** -- the quality of the spawn prompt determines
-   the quality of the output; invest heavily in precise, complete prompts
-7. **Plan for failure** -- every task has a recovery procedure; every merge has
-   a rollback path; every agent can be respawned from scratch
-8. **Foundation is sacred** -- Tier 0 tasks build the shared types, schemas,
-   and utilities that everything else depends on; rush the foundation and
-   every downstream task will fail
-9. **Ship in waves** -- each execution wave should leave the codebase in a
-   runnable, testable state; no wave should break the build
+- [examples/small-project-plan.md](examples/small-project-plan.md) -- Complete 3-module, 16-task implementation plan
 
 ## Reference Files
 
@@ -306,8 +290,7 @@ skill. If any of these are missing, the execution plan cannot be built:
 - [references/task-decomposition.md](references/task-decomposition.md) -- Task decomposition methodology and sizing
 - [references/execution-scheduling.md](references/execution-scheduling.md) -- Wave scheduling and parallel lane assignment
 - [references/spawn-prompts.md](references/spawn-prompts.md) -- Spawn prompt templates and best practices
-- [references/verification-gates.md](references/verification-gates.md) -- TDD approach and quality gate definitions
-- [references/verification-strategy.md](references/verification-strategy.md) -- Testing and integration verification patterns
+- [references/verification.md](references/verification.md) -- TDD approach, quality gates, and integration verification
 - [references/merge-integration.md](references/merge-integration.md) -- Merge strategy and conflict resolution
 - [references/progress-tracking.md](references/progress-tracking.md) -- Progress monitoring and failure recovery
 - [references/anti-patterns.md](references/anti-patterns.md) -- Known failure modes in implementation planning

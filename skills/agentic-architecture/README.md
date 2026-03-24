@@ -13,23 +13,24 @@ description: >
   or architecting a system that will be built by multiple workers. Triggers on
   phrases like "architecture plan", "software architecture", "system design for
   agents", "architect this PRD", "design the architecture", "agentic architecture".
-license: MIT
-metadata:
-  version: "3.0"
-  author: wesleydubose
 ---
 
 # Agentic Architecture Planner
 
-Generate software architecture plans that function as executable blueprints for
-parallel implementation. Traditional architecture documents optimize for human
-understanding; agentic architecture plans optimize for parallel decomposition,
-conflict-free implementation, and machine-verifiable integration points.
+Generate architecture plans optimized for parallel decomposition and
+conflict-free implementation by multiple coding agents. The plan bridges
+a PRD (what to build) and an implementation plan (how to decompose into tasks).
 
-The architecture plan is the bridge between a PRD (what to build) and an
-implementation plan (how to decompose it into tasks). A well-structured
-architecture enables 3-10 parallel workers to operate simultaneously without
-merge conflicts, duplicated effort, or architectural drift.
+## Constraints
+
+- Do NOT assign the same file to multiple modules -- overlapping ownership guarantees merge conflicts
+- Do NOT skip Tier 0 (foundation) -- shared types, schemas, and contracts must exist before feature work
+- Do NOT create circular dependencies in the DAG -- if A depends on B and B depends on A, extract the shared dependency into a lower tier
+- Do NOT define interface contracts inside feature modules -- all contracts belong in the foundation module
+- Do NOT make agent orchestration decisions (model selection, specialist roles, spawn strategies) -- those belong to the downstream implementation and execution skills
+- Do NOT leave any cross-module boundary without an explicit contract
+- Do NOT exceed 15 modules -- split into sub-projects instead
+- Do NOT produce a plan missing any item from the Output Contract table
 
 ## Position in the Pipeline
 
@@ -76,11 +77,8 @@ the PRD does not cover: directory layout, module organization, build tooling.)
 
 ### 2. Design the Module Boundary Map
 
-This is the most critical step. Module boundaries determine what can be built
-in parallel. Poor boundaries create merge conflicts; good boundaries enable
-maximum throughput.
-
-See [references/module-boundaries.md](references/module-boundaries.md) for the
+Design module boundaries first -- they determine parallelization potential.
+Read [references/module-boundaries.md](references/module-boundaries.md) for the
 complete boundary design methodology.
 
 **Core principles:**
@@ -93,10 +91,8 @@ complete boundary design methodology.
 
 ### 3. Build the Dependency DAG
 
-Map every module and its dependencies as a directed acyclic graph. This DAG
-determines the execution order and parallelization opportunities.
-
-See [references/dependency-dag.md](references/dependency-dag.md) for DAG
+Map every module and its dependencies as a directed acyclic graph.
+Read [references/dependency-dag.md](references/dependency-dag.md) for DAG
 construction methodology.
 
 **The DAG must answer:**
@@ -108,11 +104,8 @@ construction methodology.
 
 ### 4. Define Interface Contracts
 
-Every boundary between modules must have an explicit contract. Workers building
-module A must know exactly what module B will provide, without needing to read
-module B's implementation.
-
-See [references/interface-contracts.md](references/interface-contracts.md) for
+Define an explicit contract for every cross-module boundary. Read
+[references/interface-contracts.md](references/interface-contracts.md) for
 contract specification patterns.
 
 **Every contract must include:**
@@ -208,3 +201,11 @@ skill. If any of these are missing, the implementation plan cannot be built:
 - [references/architecture-template.md](references/architecture-template.md) -- Complete architecture plan template
 - [references/claude-md-config.md](references/claude-md-config.md) -- CLAUDE.md configuration for multi-worker projects
 - [references/anti-patterns.md](references/anti-patterns.md) -- Known failure modes and how to avoid them
+
+## Evaluation Scenarios
+
+1. **Happy path**: Given a PRD for a 4-feature web app (auth, products, orders, notifications), generate an architecture plan with vertical slicing, a 3-tier DAG (foundation -> features -> integration), full interface contracts, and CLAUDE.md recommendations. Verify every Output Contract item is present.
+
+2. **Edge case -- existing codebase, no PRD**: Given an existing monorepo with no PRD, explore the codebase and produce a retroactive architecture plan documenting current module boundaries, identifying file ownership conflicts, and recommending a DAG for future parallel work.
+
+3. **Failure case -- monolith trap**: Given a PRD where all features share a single database table and heavy cross-feature dependencies, verify the skill detects the monolith trap, recommends extracting shared types into foundation, and produces a DAG with width > 1 at Tier 1 (not a sequential chain).

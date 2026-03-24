@@ -15,11 +15,9 @@ description: >
   an implementation plan into executable dispatch commands. Triggers on phrases
   like "execution plan", "execute the implementation", "dispatch agents",
   "run the swarm", "agentic execution", "execute with agents", "launch the
-  build", "orchestrate the implementation".
-license: MIT
-metadata:
-  version: "2.0"
-  author: wesleydubose
+  build", "orchestrate the implementation". Not for: creating implementation
+  plans (use agentic-implementation), structural decomposition (use
+  agentic-architecture), or writing PRDs (use agentic-prd).
 ---
 
 # Agentic Execution Planner
@@ -153,21 +151,14 @@ Create `.claude/agents/` definition files for each specialist role needed.
 Specialist agents outperform generalists because they have narrow, focused
 system prompts with restricted scope.
 
+Standard specialist roles include Foundation Builder (Opus, Wave 1),
+Feature Implementers (Sonnet, Wave 2+), Integration Wirer (Sonnet/Opus,
+final wave), Merge Conductor (Opus, wave transitions), and Recovery Agent
+(Opus, on failure). Optional hardening roles: Test Hardener, Security
+Reviewer, Performance Auditor (all Sonnet, post-integration).
+
 See [references/specialist-agents.md](references/specialist-agents.md) for
-agent definition templates and role patterns.
-
-**Standard specialist roles:**
-
-| Specialist | Focus | Model | When Used |
-|-----------|-------|-------|-----------|
-| Foundation Builder | Shared types, schemas, utils | opus | Wave 1 |
-| Feature Implementer | Single module implementation | sonnet | Wave 2+ |
-| Integration Wirer | Route composition, middleware, E2E | sonnet/opus | Final wave |
-| Test Hardener | Test coverage gaps, edge cases | sonnet | Post-integration |
-| Security Reviewer | SAST patterns, auth flows, input validation | sonnet | Post-integration |
-| Performance Auditor | Bundle size, query optimization, caching | sonnet | Post-integration |
-| Merge Conductor | Sequential merge, conflict resolution | opus | Wave transitions |
-| Recovery Agent | Diagnose failures, fix broken modules | opus | On failure |
+full role definitions, agent file templates, and model selection matrix.
 
 ### 5. Generate the Execution Runbook
 
@@ -257,68 +248,41 @@ Provide the user with:
 - Clear instructions for how to begin execution (exact first command to run)
 - Any risks or open questions that need resolution before launching
 
-## Research-Backed Execution Thresholds
+## Constraints
 
-These empirically validated thresholds should guide execution plan generation:
-
-- **45% single-agent threshold** (Google/MIT, Dec 2025): If a single agent
-  exceeds 45% success on a non-decomposable task, adding more agents DEGRADES
-  performance. Multi-agent only helps for parallelizable, decomposable work.
-- **35-minute degradation cliff** (Zylos Research, 2026): Agent performance
-  degrades after 35 minutes of continuous operation. Doubling task duration
-  quadruples the failure rate. Time-box all agent sessions.
-- **79% specification failure rate** (MAST/UC Berkeley, 2025): 79% of
-  multi-agent failures originate from specification and coordination issues,
-  NOT from model limitations. The upstream pipeline's quality determines success.
-- **17x error amplification** (Google/MIT): Uncoordinated "bag of agents"
-  architectures amplify errors 17.2x. Centralized orchestration reduces this
-  to 4.4x. Always use structured wave dispatch with gates.
-- **Context rot starts immediately** (Chroma Research, 2026): Performance
-  degrades at every context length increment, not just near the limit.
-  Effective context is ~200K tokens even with 1M windows. Keep spawn prompts
-  focused (ETH Zurich: context files >300 lines reduce success by ~3% and
-  increase costs by >20%).
-- **90.2% improvement** (Anthropic): Opus lead + Sonnet workers outperformed
-  single-agent Opus by 90.2%. Model stratification is the highest-leverage
-  optimization.
-- **15x token cost** (Anthropic): Multi-agent systems use ~15x more tokens
-  than single-agent. Budget controls are essential, not optional.
+- Do NOT dispatch agents without running the pre-flight checklist first
+- Do NOT skip wave gates -- no wave advances without its gate passing
+- Do NOT use Opus for all agents -- use model stratification (Opus for
+  lead/foundation/critical path, Sonnet for feature work, Haiku for research)
+- Do NOT let agents run longer than 35 minutes without a checkpoint commit --
+  spawn fresh agents instead (performance degrades after 35 min)
+- Do NOT use multi-agent execution for <10 tasks, tightly coupled modules,
+  or work a single agent can complete in <30 min -- single-agent outperforms
+- Do NOT abbreviate spawn prompts to "save tokens" -- vague delegation is
+  the primary cause of multi-agent failures
+- Do NOT merge branches in parallel -- sequential merge with test-after-each
+  is mandatory
 
 ## Key Principles
 
-1. **Execution plans are runtime playbooks** -- they specify exactly what
-   commands to run, what to monitor, and what to do when things go wrong;
-   an operator should be able to follow the plan step-by-step without
-   improvisation
-2. **Specialist agents outperform generalists** -- narrow scope, focused
-   prompts, and restricted tools produce better output than "do everything"
-   agents; define explicit specialist roles for every wave
-3. **Budget is a first-class constraint** -- multi-agent execution costs
-   15-50x more than single-agent; every wave has a token ceiling, every
-   agent has a cost budget, and early-stopping triggers prevent runaway spend
-4. **Adaptive re-planning is expected** -- no execution goes perfectly;
-   build recovery circuits into every wave so failures are handled
-   automatically rather than requiring manual intervention
-5. **Gates are non-negotiable** -- no wave advances without its gate
-   passing; no merge happens without test-after-each; gates catch errors
-   when they are cheapest to fix
-6. **Monitor continuously, not after the fact** -- live progress tracking
-   detects problems in minutes instead of discovering them at integration
-   time; define monitoring hooks for every wave
-7. **Dispatch is copy-paste ready** -- every command in the execution plan
-   should be directly executable; no "adapt this to your environment"
-   placeholders; the operator copies, pastes, and runs
-8. **Time-box every agent** -- no agent should run longer than 30-35
-   minutes without a checkpoint commit; context degradation is empirically
-   proven to start early and accelerate; fresh spawns are cheaper than
-   degraded output (Zylos Research, Chroma Research)
-9. **Model stratification saves money** -- Opus for lead/foundation/
-   critical path; Sonnet for parallel feature work; Haiku for exploration
-   and research; Anthropic confirms "Opus lead with Sonnet workers
-   outperformed single-agent Opus by 90.2%"
-10. **Know when NOT to swarm** -- if <10 tasks, tightly coupled modules,
-    or a single agent can complete the work in <30 min, single-agent
-    execution outperforms multi-agent (Google/MIT 45% threshold)
+1. **Execution plans are runtime playbooks** -- an operator follows
+   step-by-step without improvisation; every command is copy-paste ready
+2. **Specialists outperform generalists** -- narrow scope, focused prompts,
+   and restricted tools; define explicit specialist roles for every wave
+3. **Budget is a first-class constraint** -- multi-agent costs 15-50x more;
+   every wave has a token ceiling and early-stopping triggers
+4. **Gates are non-negotiable** -- no wave advances without passing; gates
+   catch errors when they are cheapest to fix
+5. **Adaptive re-planning is expected** -- build recovery circuits into
+   every wave; failures are handled automatically, not manually
+6. **Time-box and monitor continuously** -- check progress every 10 min;
+   agents degrade after 35 min; fresh spawns beat degraded output
+7. **Model stratification saves money** -- Opus lead + Sonnet workers
+   outperformed single-agent Opus by 90.2% (Anthropic research)
+
+See [references/anti-patterns.md](references/anti-patterns.md) and
+[references/budget-controls.md](references/budget-controls.md) for
+research-backed thresholds and detailed failure modes.
 
 ## Reference Files
 

@@ -18,13 +18,15 @@ early-stopping triggers prevent runaway spend.
 - Output tokens: code written + test output + explanations
 - Tool use overhead: each tool call adds ~200-500 tokens
 
-**Rough estimates by model (as of early 2026):**
+**Relative cost by model (ratios remain stable across pricing changes):**
 
-| Model | Input (per 1M tokens) | Output (per 1M tokens) | Typical session tokens |
-|-------|----------------------|----------------------|----------------------|
-| claude-opus-4-6 | $15 | $75 | 100-300K |
-| claude-sonnet-4-6 | $3 | $15 | 80-200K |
-| claude-haiku-4-5 | $0.80 | $4 | 50-100K |
+| Model | Relative Input Cost | Relative Output Cost | Typical session tokens |
+|-------|--------------------|--------------------|----------------------|
+| claude-opus-4-6 | 5x Sonnet | 5x Sonnet | 100-300K |
+| claude-sonnet-4-6 | 1x (baseline) | 1x (baseline) | 80-200K |
+| claude-haiku-4-5 | ~0.25x Sonnet | ~0.25x Sonnet | 50-100K |
+
+Check current absolute pricing at your API provider's pricing page.
 
 **Per-agent session cost (typical):**
 

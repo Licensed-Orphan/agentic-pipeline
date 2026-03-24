@@ -1,7 +1,7 @@
 ---
 name: agentic-prd
 description: >
-  Generate PRDs (Product Requirements Documents) optimized for AI agentic coding
+  Generates PRDs (Product Requirements Documents) optimized for AI agentic coding
   tools. Produces phased, dependency-ordered specifications with machine-verifiable
   acceptance criteria, explicit constraints, and protection patterns that AI coding
   agents can reliably implement. Use when: writing a PRD, creating a product spec,
@@ -9,11 +9,9 @@ description: >
   Code or other agentic tools, drafting technical specifications, or decomposing a
   project into implementable phases. Triggers on phrases like "write a PRD",
   "product requirements", "spec for this feature", "plan this project",
-  "agentic PRD", "specification for AI coding".
-license: MIT
-metadata:
-  version: "1.0"
-  author: wesleydubose
+  "agentic PRD", "specification for AI coding". Not for architecture planning
+  (use agentic-architecture) or implementation task breakdown (use
+  agentic-implementation).
 ---
 
 # Agentic PRD Generator
@@ -120,9 +118,19 @@ Always update the PRD file to reflect ground truth. The spec is the source of tr
 5. **State constraints explicitly** -- AI cannot infer boundaries from omission
 6. **Compensate for AI weaknesses** -- explicitly require error handling, null checks, security patterns, and performance considerations (AI systematically omits these)
 7. **Keep context lean** -- stay under 50 requirements per phase
-8. **Use full paths** -- always specify complete file paths
-9. **Each phase must be runnable** -- no dead ends, commented-out code, or placeholders
-10. **Protect what works** -- DO NOT CHANGE sections for every phase after the first
+8. **Each phase must be runnable** -- no dead ends, commented-out code, or placeholders
+9. **Protect what works** -- DO NOT CHANGE sections for every phase after the first
+
+## Constraints
+
+- DO NOT use bare filenames -- always specify full file paths (agents create duplicates otherwise)
+- DO NOT write subjective acceptance criteria -- every criterion must be machine-verifiable with specific values, thresholds, or observable behaviors
+- DO NOT skip the research phase -- outdated assumptions compound into cascading implementation failures
+- DO NOT exceed 50 requirements per phase -- LLM performance degrades beyond ~150-200 instructions total
+- DO NOT write phases that leave the codebase in a non-runnable state
+- DO NOT omit Non-Goals -- AI cannot infer scope from omission and will add features unprompted
+- DO NOT omit DO NOT CHANGE sections in phases after Phase 1
+- DO NOT omit error handling, security, or performance requirements -- AI systematically skips these unless explicitly required
 
 ## Reference Files
 
@@ -131,3 +139,4 @@ Always update the PRD file to reflect ground truth. The spec is the source of tr
 - [references/phase-structure.md](references/phase-structure.md) -- Phase sizing, dependency mapping, and sequencing
 - [references/acceptance-criteria.md](references/acceptance-criteria.md) -- Machine-verifiable criteria patterns
 - [references/protection-patterns.md](references/protection-patterns.md) -- Constraint and boundary patterns
+- [examples/small-prd.md](examples/small-prd.md) -- Completed example: 3-phase bookmark manager PRD
